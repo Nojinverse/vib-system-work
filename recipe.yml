@@ -34,6 +34,12 @@ stages:
     commands:
     - echo Example output
 
+  - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
+    type: shell
+    commands:
+    - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+    - apt-get install ./sysbox-ce_0.6.4-0.linux_amd64.deb
+
   - name: example-modules # Sample module demonstrating importing local and remote modules
     type: includes
     includes:
