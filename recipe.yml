@@ -27,11 +27,17 @@ stages:
     type: apt
     source:
       packages:
-      - vim
-      - wget
-      - git
-      - make
-      - go
+      - wget # needed for go installation
+      - tar  # needed for go installation
+      - git  # needed for Vib installation
+      - make # needed for Vib installation
+      
+  - name: install-go
+    type: shell
+    commands:
+    - wget https://go.dev/dl/go1.23.0.linux-amd64.tar.gz
+    - tar -C /usr/local -xzf go1.23.0.linux-amd64.tar.gz
+    - export PATH=$PATH:/usr/local/go/bin
 
   - name: setup git
     type: shell
