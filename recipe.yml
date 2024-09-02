@@ -77,7 +77,8 @@ stages:
     type: shell
     commands:
     - usermod -aG docker $USER
-
+    - systemctl enable docker.service
+    - systemctl enable containerd.service
 
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
   #   type: shell
