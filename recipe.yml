@@ -73,6 +73,13 @@ stages:
       - docker-compose-plugin
   #     - libfuse2t64 # needed for sysbox
 
+  - name: post-docker
+    type: shell
+    commands:
+    - groupadd docker
+    - usermod -aG docker $USER
+
+
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
   #   type: shell
   #   commands:
