@@ -44,7 +44,7 @@ stages:
   - name: setup git # needed for Vib installation
     type: shell
     commands:
-    - git config user.name "vib-system-work"
+    - git config --global user.name "vib-system-work"
 
   - name: install-Vib
     type: shell
