@@ -41,7 +41,7 @@ stages:
   - name: install-Vib
     type: shell
     commands:
-    - git clone git@github.com:Vanilla-OS/Vib.git
+    - git clone https://github.com/Vanilla-OS/Vib.git
     - cd Vib
     - make build
     - make build-plugins
