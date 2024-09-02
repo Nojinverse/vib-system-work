@@ -76,7 +76,7 @@ stages:
   - name: post-docker
     type: shell
     commands:
-    # - usermod -aG docker $USER
+    - usermod -aG docker joiv
     - systemctl enable docker.service
     - systemctl enable containerd.service
 
