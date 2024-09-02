@@ -32,18 +32,18 @@ stages:
       - git  # needed for Vib installation
       - make # needed for Vib installation
       
-  - name: install-go
+  - name: install-go # needed for Vib installation
     type: shell
     commands:
     - wget https://go.dev/dl/go1.23.0.linux-amd64.tar.gz
     - tar -C /usr/local -xzf go1.23.0.linux-amd64.tar.gz
     - export PATH=$PATH:/usr/local/go/bin
 
-  - name: setup git
+  - name: setup git # needed for Vib installation
     type: shell
     commands:
-    - git config user.name "vib-system-work"
-    - git config user.email "vib-system-work@nojinverse.com"
+    - git config --global user.name "vib-system-work"
+    - git config --global user.email "vib-system-work@nojinverse.com"
 
   - name: install-Vib
     type: shell
