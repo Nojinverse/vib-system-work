@@ -23,7 +23,7 @@ stages:
 
   # Put your custom actions behind this comment
 
-  - name: example-packages # Sample module using the built-in Apt module to install packages
+  - name: prerequisistes-packages 
     type: apt
     source:
       packages:
@@ -33,21 +33,13 @@ stages:
       - make         # needed for Vib installation
       - golang-go    # needed for Vib installation
       - libbtrfs-dev # needed for Vib installation
-      
-  # - name: install-go # needed for Vib installation
-  #   type: shell
-  #   commands:
-  #   - wget https://go.dev/dl/go1.23.0.linux-amd64.tar.gz # Download
-  #   - tar -C /usr/local -xzf go1.23.0.linux-amd64.tar.gz # Extract
-  #   - export PATH=$PATH:/usr/local/go/bin                # Add to path
-  #   - go version                                         # verify
 
-  - name: setup git # needed for Vib installation
+  - name: prerequisistes-configuration
     type: shell
     commands:
-    - git config --global user.name "vib-system-work"
+    - git config --global user.name "vib-system-work" # needed for git clone
 
-  - name: install-Vib
+  - name: install-Vib # Vanilla Image Builder. Used for local development of custom vanilaos images
     type: shell
     commands:
     - git clone https://github.com/Vanilla-OS/Vib.git
@@ -56,6 +48,11 @@ stages:
     - make build-plugins
     - make install
     - make install-plugins
+    - wget https://github.com/Vanilla-OS/vib-fsguard/releases/download/v1.5.3/fsguard.so
+    - mv ./fsguard.so /usr/share/vib/plugins
+
+
+
 
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
   #   type: shell
