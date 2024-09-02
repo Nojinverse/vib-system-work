@@ -15,7 +15,7 @@ permissions:
   contents: read
 
 env:
-  CUSTOM_IMAGE_NAME: custom
+  CUSTOM_IMAGE_NAME: vib-system-work
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
 
 jobs:
