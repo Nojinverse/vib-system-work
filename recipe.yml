@@ -29,17 +29,24 @@ stages:
       packages:
       - vim
       - wget
+      - git
+      - make
 
-  - name: example-commands # Sample module demonstrating the Shell module with custom commands
+  - name: install-Vib
     type: shell
     commands:
-    - echo Example output
+    - git clone git@github.com:Vanilla-OS/Vib.git
+    - cd Vib
+    - make build
+    - make build-plugins
+    - make install
+    - make install-plugins
 
-  - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
-    type: shell
-    commands:
-    - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
-    - apt-get install ./sysbox-ce_0.6.4-0.linux_amd64.deb
+  # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
+  #   type: shell
+  #   commands:
+  #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+  #   - apt-get install ./sysbox-ce_0.6.4-0.linux_amd64.deb
 
   - name: example-modules # Sample module demonstrating importing local and remote modules
     type: includes
