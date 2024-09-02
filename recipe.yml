@@ -28,10 +28,11 @@ stages:
     source:
       packages:
       - wget # needed for go installation
-      - tar  # needed for go installation
-      - git  # needed for Vib installation
-      - make # needed for Vib installation
-      - golang-go
+      - tar  
+      - git          # needed for Vib installation
+      - make         # needed for Vib installation
+      - golang-go    # needed for Vib installation
+      - libbtrfs-dev # needed for Vib installation
       
   # - name: install-go # needed for Vib installation
   #   type: shell
