@@ -43,7 +43,6 @@ stages:
     type: shell
     commands:
     - git config --global user.name "vib-system-work"
-    - git config --global user.email "vib-system-work@nojinverse.com"
 
   - name: install-Vib
     type: shell
