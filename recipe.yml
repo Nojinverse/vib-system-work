@@ -32,6 +32,12 @@ stages:
       - git
       - make
 
+  - name: setup git
+    type: shell
+    commands:
+    - git config --global user.name "vib-system-work"
+    - git config --global user.name "vib-system-work@nojinverse.com"
+
   - name: install-Vib
     type: shell
     commands:
