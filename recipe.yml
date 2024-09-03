@@ -34,7 +34,7 @@ stages:
       - wget                       # needed for Vib installation
       - ca-certificates            # needed for docker installation
       - curl                       # needed for docker installation
-      - gnupg                      # needed for sysbox, terraform installation
+      - gnupg2                     # needed for sysbox, terraform installation
       - software-properties-common # needed for terraform installation
 
   - name: prerequisistes-configuration
