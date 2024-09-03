@@ -27,14 +27,15 @@ stages:
     type: apt
     source:
       packages:
-      - git             # needed for Vib, Sysbox installation
-      - make            # needed for Vib installation
-      - golang-go       # needed for Vib installation
-      - libbtrfs-dev    # needed for Vib installation
-      - wget            # needed for Vib installation
-      - ca-certificates # needed for docker installation
-      - curl            # needed for docker installation
-      - gnupg           # needed for sysbox installation
+      - git                        # needed for Vib, Sysbox installation
+      - make                       # needed for Vib installation
+      - golang-go                  # needed for Vib installation
+      - libbtrfs-dev               # needed for Vib installation
+      - wget                       # needed for Vib installation
+      - ca-certificates            # needed for docker installation
+      - curl                       # needed for docker installation
+      - gnupg                      # needed for sysbox, terraform installation
+      - software-properties-common # needed for terraform installation
 
   - name: prerequisistes-configuration
     type: shell
@@ -53,7 +54,7 @@ stages:
     - wget https://github.com/Vanilla-OS/vib-fsguard/releases/download/v1.5.3/fsguard.so
     - mv ./fsguard.so /usr/share/vib/plugins
 
-  - name: prerequisistes-docker
+  - name: prerequisites-docker
     type: shell
     commands:
     # Add Docker's official GPG key
@@ -90,6 +91,19 @@ stages:
   #   - make install
   #   # - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
   #   # - apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
+
+  - name: prerequisites-terraform
+    type: shell
+    commands:
+    - wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+    - echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+    - apt update
+
+  - name: install-terraform
+    type: apt
+    source:
+      packages:
+      - terraform
 
   - name: example-modules # Sample module demonstrating importing local and remote modules
     type: includes
