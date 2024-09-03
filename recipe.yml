@@ -27,13 +27,14 @@ stages:
     type: apt
     source:
       packages:
-      - git             # needed for Vib installation
+      - git             # needed for Vib, Sysbox installation
       - make            # needed for Vib installation
       - golang-go       # needed for Vib installation
       - libbtrfs-dev    # needed for Vib installation
       - wget            # needed for Vib installation
       - ca-certificates # needed for docker installation
       - curl            # needed for docker installation
+      - gnupg           # needed for sysbox installation
 
   - name: prerequisistes-configuration
     type: shell
@@ -76,15 +77,19 @@ stages:
   - name: post-docker
     type: shell
     commands:
-    - usermod -aG docker joiv
     - systemctl enable docker.service
     - systemctl enable containerd.service
 
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
   #   type: shell
   #   commands:
-  #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
-  #   - apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
+  #   # # docker must be running
+  #   - git clone https://github.com/nestybox/sysbox.git
+  #   - cd sysbox
+  #   - make sysbox-static -e IMAGE_BASE_DISTRO=debian -e IMAGE_BASE_RELEASE=bullseye
+  #   - make install
+  #   # - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+  #   # - apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
 
   - name: example-modules # Sample module demonstrating importing local and remote modules
     type: includes
