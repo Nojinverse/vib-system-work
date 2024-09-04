@@ -8,6 +8,8 @@ stages:
     maintainer: self-maintained # Optionally, Replace this with your name
   args:
     DEBIAN_FRONTEND: noninteractive # Set the image environment as non-interactive
+    JSON: '{\"default-runtime\":\"runc\",\"runtimes\":{\"sysbox-runc\":{\"path\":\"/home/joiv/.local/bin/sysbox-runc\"}}}'
+
   
   # Commands to run first before building the modules
   runs:
@@ -101,10 +103,10 @@ stages:
 
   - name: post-docker
     type: shell
-    buildvars:
-      JSON: "{\"default-runtime\": \"runc\", \"runtimes\": {\"sysbox-runc\": {\"path\": \"/home/joiv/.local/bin/sysbox-runc\"}}}"
     commands:
-    - echo $JSON | jq -M
+    - echo "test"
+    - echo "$JSON"
+    - echo ""
     - echo $JSON | jq -M > /etc/docker/daemon.json
     - cat /etc/docker/daemon.json
     - systemctl enable docker.service
