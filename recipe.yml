@@ -8,9 +8,7 @@ stages:
     maintainer: self-maintained # Optionally, Replace this with your name
   args:
     DEBIAN_FRONTEND: noninteractive # Set the image environment as non-interactive
-    JSON: '{\"default-runtime\":\"runc\",\"runtimes\":{\"sysbox-runc\":{\"path\":\"/home/joiv/.local/bin/sysbox-runc\"}}}'
-
-  
+    JSON: '"{\"bip\":\"172.24.0.1/16\",\"default-address-pools\":[{\"base\":\"172.31.0.0/16\",\"size\":24}],\"default-runtime\":\"runc\",\"runtimes\":{\"sysbox-runc\":{\"path\":\"/home/joiv/.local/bin/sysbox-runc\"}}}"'
   # Commands to run first before building the modules
   runs:
     commands:
@@ -117,6 +115,10 @@ stages:
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
   #   type: shell
   #   commands:
+  #   - 
+  #   - cat /etc/docker/daemon.json
+  #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+  #   - apt-get  -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true  install ./sysbox-ce_0.6.4-0.linux_amd64.deb || true
   #   # # docker must be running
   #   # - docker info
   #   # - whoami
