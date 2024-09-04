@@ -130,12 +130,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set image info
+    - name: install-sysbox
       run: |
-        git clone https://github.com/nestybox/sysbox.git
-        cd sysbox
-        make sysbox -e IMAGE_BASE_DISTRO=debian -e IMAGE_BASE_RELEASE=bullseye
-        make install
+        wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+        apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
 
     - uses: vanilla-os/vib-gh-action@v0.7.4
       with:
