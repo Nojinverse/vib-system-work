@@ -36,6 +36,7 @@ stages:
       - curl                       # needed for docker installation
       - gnupg2                     # needed for sysbox, terraform installation
       - software-properties-common # needed for terraform installation
+      - jq                         # needed for sysbox installation
 
   - name: prerequisistes-configuration
     type: shell
@@ -54,44 +55,6 @@ stages:
     - wget https://github.com/Vanilla-OS/vib-fsguard/releases/download/v1.5.3/fsguard.so
     - mv ./fsguard.so /usr/share/vib/plugins
 
-  - name: prerequisites-docker
-    type: shell
-    commands:
-    # Add Docker's official GPG key
-    - install -m 0755 -d /etc/apt/keyrings
-    - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-    - chmod a+r /etc/apt/keyrings/docker.asc
-    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    - apt update
-
-  - name: install-docker
-    type: apt
-    source:
-      packages:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-buildx-plugin
-      - docker-compose-plugin
-  #     - libfuse2t64 # needed for sysbox
-
-  - name: post-docker
-    type: shell
-    commands:
-    - systemctl enable docker.service
-    - systemctl enable containerd.service
-
-  # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
-  #   type: shell
-  #   commands:
-  #   # # docker must be running
-  #   - git clone https://github.com/nestybox/sysbox.git
-  #   - cd sysbox
-  #   - make sysbox-static -e IMAGE_BASE_DISTRO=debian -e IMAGE_BASE_RELEASE=bullseye
-  #   - make install
-  #   # - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
-  #   # - apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
-
   - name: prerequisites-terraform
     type: shell
     commands:
@@ -104,6 +67,68 @@ stages:
     source:
       packages:
       - terraform
+
+  - name: prerequisites-install-docker
+    type: apt
+    source:
+      packages:
+      - uidmap # needed for rootless-docker
+      - dbus-user-session 
+      - slirp4netns
+
+
+  - name: prerequisites-docker
+    type: shell
+    commands:
+    # Add Docker's official GPG key
+    - install -m 0755 -d /etc/apt/keyrings
+    - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    - chmod a+r /etc/apt/keyrings/docker.asc
+    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - apt update
+    - apt install 
+
+  - name: install-docker
+    type: apt
+    source:
+      packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+  # #     - libfuse2t64 # needed for sysbox
+
+  - name: post-docker
+    type: shell
+    commands:
+    - >
+      echo \"{\"default-runtime\"\: \"runc\", \"runtimes\"\: {\"sysbox-runc\": {\"path\"\: \"/home/joiv/.local/bin/sysbox-runc\"}}}\" > /etc/docker/daemon.json
+    - cat /etc/docker/daemon.json
+    - systemctl enable docker.service
+    - systemctl enable containerd.service
+    # - dockerd --iptables=false
+
+
+  # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
+  #   type: shell
+  #   commands:
+  #   # # docker must be running
+  #   # - docker info
+  #   # - whoami
+  #   # - usermod -aG docker $USER
+  #   # - newgrp docker
+  #   # - which docker
+  #   # - dockerd
+  #   - cat /etc/docker/daemon.json
+  #   - git clone https://github.com/nestybox/sysbox.git
+  #   - cd sysbox
+  #   - make sysbox -e IMAGE_BASE_DISTRO=debian -e IMAGE_BASE_RELEASE=bullseye
+  #   - make install
+  # #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+  #   - apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
+
+
 
   - name: example-modules # Sample module demonstrating importing local and remote modules
     type: includes
