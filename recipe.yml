@@ -101,9 +101,11 @@ stages:
 
   - name: post-docker
     type: shell
+    buildvars:
+      JSON: "{\"default-runtime\": \"runc\", \"runtimes\": {\"sysbox-runc\": {\"path\": \"/home/joiv/.local/bin/sysbox-runc\"}}}"
     commands:
-    - >
-      echo \"{\"default-runtime\"\: \"runc\", \"runtimes\"\: {\"sysbox-runc\": {\"path\"\: \"/home/joiv/.local/bin/sysbox-runc\"}}}\" > /etc/docker/daemon.json
+    - echo $JSON | jq -M
+    - echo $JSON | jq -M > /etc/docker/daemon.json
     - cat /etc/docker/daemon.json
     - systemctl enable docker.service
     - systemctl enable containerd.service
