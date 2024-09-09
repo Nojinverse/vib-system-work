@@ -104,6 +104,11 @@ stages:
     commands:
     - systemctl enable docker.service
     - systemctl enable containerd.service
+    - echo "json:"
+    - echo "$JSON"
+    - echo ""
+    - mkdir -p /.system/etc/docker
+    - echo $JSON | jq -M > /.system/etc/docker/daemon.json
     # - dockerd --iptables=false
 
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
