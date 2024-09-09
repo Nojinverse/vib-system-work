@@ -8,7 +8,7 @@ stages:
     maintainer: self-maintained # Optionally, Replace this with your name
   args:
     DEBIAN_FRONTEND: noninteractive # Set the image environment as non-interactive
-    JSON: '"{\"bip\":\"172.24.0.1/16\",\"default-address-pools\":[{\"base\":\"172.31.0.0/16\",\"size\":24}],\"default-runtime\":\"runc\",\"runtimes\":{\"sysbox-runc\":{\"path\":\"/home/joiv/.local/bin/sysbox-runc\"}}}"'
+    JSON: '"{\"bip\":\"172.24.0.1/16\",\"default-address-pools\":[{\"base\":\"172.31.0.0/16\",\"size\":24}],\"default-runtime\":\"runc\",\"runtimes\":{\"sysbox-runc\":{\"path\":\"/home/joiv/.local/bin/sysbox-runc\"}},\"features\":{\"buildkit\":true}}"'
   # Commands to run first before building the modules
   runs:
     commands:
@@ -102,24 +102,39 @@ stages:
   - name: post-docker
     type: shell
     commands:
-    - echo "test"
-    - echo "$JSON"
-    - echo ""
-    - echo $JSON | jq -M > /etc/docker/daemon.json
-    - cat /etc/docker/daemon.json
     - systemctl enable docker.service
     - systemctl enable containerd.service
     # - dockerd --iptables=false
 
-
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
   #   type: shell
   #   commands:
-  #   - 
-  #   - cat /etc/docker/daemon.json
+  #   - mkdir sysbox
+  #   - cd sysbox
+  #   - wget https://github.com/just-containers/s6-overlay/releases/download/v2.1.0.2/s6-overlay-amd64-installer
+  #   - ls
+  #   - chmod +x ./s6-overlay-amd64-installer
+  #   - ./s6-overlay-amd64-installer .
+  #   - ls -a
+  #   - mv s6-services /etc/services.d/
+  #   - mv sysbox /etc/cont-init.d/
+  #   - mv sysbox-mgr /usr/bin/sysbox-mgr
+  #   - mv sysbox-fs /usr/bin/sysbox-fs
+  #   - mv sysbox-runc /usr/bin/sysbox-runc
+    # - git clone https://github.com/nestybox/sysbox.git
+    # - cd sysbox
+    # - make sysbox-in-docker debian-bullseye
+  #   - echo "test"
+  #   - echo "$JSON"
+  #   - echo ""
+  #   - mkdir -p /.system/etc/docker
+  #   - echo $JSON | jq -M > /.system/etc/docker/daemon.json
+  #   - cat /.system/etc/docker/daemon.json
+  #   - dockerd --config-file /.system/etc/docker/daemon.json
   #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
   #   - apt-get  -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true  install ./sysbox-ce_0.6.4-0.linux_amd64.deb || true
-  #   # # docker must be running
+  #   - apt-get install -y ./sysbox-ce_0.6.4-0.linux_amd64.deb
+  # # # docker must be running
   #   # - docker info
   #   # - whoami
   #   # - usermod -aG docker $USER
@@ -133,7 +148,6 @@ stages:
   #   - make install
   # #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
   #   - apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
-
 
 
   - name: example-modules # Sample module demonstrating importing local and remote modules
