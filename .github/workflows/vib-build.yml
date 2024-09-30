@@ -10,8 +10,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  packages: write
+  contents: read
+
 env:
-  CUSTOM_IMAGE_NAME: custom
+  CUSTOM_IMAGE_NAME: vib-system-work
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
 
 jobs:
@@ -125,7 +129,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
+    
     - uses: vanilla-os/vib-gh-action@v0.8.1
       with:
         recipe: 'recipe.yml'

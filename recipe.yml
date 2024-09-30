@@ -8,7 +8,7 @@ stages:
     maintainer: self-maintained # Optionally, Replace this with your name
   args:
     DEBIAN_FRONTEND: noninteractive # Set the image environment as non-interactive
-  
+    JSON: '"{\"bip\":\"172.24.0.1/16\",\"default-address-pools\":[{\"base\":\"172.31.0.0/16\",\"size\":24}],\"default-runtime\":\"runc\",\"runtimes\":{\"sysbox-runc\":{\"path\":\"/home/joiv/.local/bin/sysbox-runc\"}},\"features\":{\"buildkit\":true}}"'
   # Commands to run first before building the modules
   runs:
     commands:
@@ -23,16 +23,145 @@ stages:
 
   # Put your custom actions behind this comment
 
-  - name: example-packages # Sample module using the built-in Apt module to install packages
+  - name: prerequisistes-packages 
     type: apt
     source:
       packages:
-      - vim
+      - git                        # needed for Vib, Sysbox installation
+      - make                       # needed for Vib installation
+      - golang-go                  # needed for Vib installation
+      - libbtrfs-dev               # needed for Vib installation
+      - wget                       # needed for Vib installation
+      - ca-certificates            # needed for docker installation
+      - curl                       # needed for docker installation
+      - gnupg2                     # needed for sysbox, terraform installation
+      - software-properties-common # needed for terraform installation
+      - jq                         # needed for sysbox installation
 
-  - name: example-commands # Sample module demonstrating the Shell module with custom commands
+  - name: prerequisistes-configuration
     type: shell
     commands:
-    - echo Example output
+    - git config --global user.name "vib-system-work" # needed for git clone
+
+  - name: install-Vib # Vanilla Image Builder. Used for local development of custom vanilaos images
+    type: shell
+    commands:
+    - git clone https://github.com/Vanilla-OS/Vib.git
+    - cd Vib
+    - make build
+    - make build-plugins
+    - make install
+    - make install-plugins
+    - wget https://github.com/Vanilla-OS/vib-fsguard/releases/download/v1.5.3/fsguard.so
+    - mv ./fsguard.so /usr/share/vib/plugins
+
+  - name: prerequisites-terraform
+    type: shell
+    commands:
+    - wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+    - echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com bookworm main" | tee /etc/apt/sources.list.d/hashicorp.list
+    - apt update
+
+  - name: install-terraform
+    type: apt
+    source:
+      packages:
+      - terraform
+
+  - name: prerequisites-install-docker
+    type: apt
+    source:
+      packages:
+      - uidmap # needed for rootless-docker
+      - dbus-user-session 
+      - slirp4netns
+
+
+  - name: prerequisites-docker
+    type: shell
+    commands:
+    # Add Docker's official GPG key
+    - install -m 0755 -d /etc/apt/keyrings
+    - curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    - chmod a+r /etc/apt/keyrings/docker.asc
+    - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    - apt update
+    - apt install 
+
+  - name: install-docker
+    type: apt
+    source:
+      packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+  # #     - libfuse2t64 # needed for sysbox
+
+  - name: post-docker
+    type: shell
+    commands:
+    - systemctl enable docker.service
+    - systemctl enable containerd.service
+    - echo "json:"
+    - echo "$JSON"
+    - echo ""
+    - mkdir -p /.system/etc/docker
+    - echo $JSON | jq -M > /.system/etc/docker/daemon.json
+    # - dockerd --iptables=false
+
+  - name: crossplane
+    type: shell
+    commands:
+    - curl -sL "https://raw.githubusercontent.com/crossplane/crossplane/main/install.sh" | sh    
+    - mv crossplane /usr/local/bin
+
+
+      
+  # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
+  #   type: shell
+  #   commands:
+  #   - mkdir sysbox
+  #   - cd sysbox
+  #   - wget https://github.com/just-containers/s6-overlay/releases/download/v2.1.0.2/s6-overlay-amd64-installer
+  #   - ls
+  #   - chmod +x ./s6-overlay-amd64-installer
+  #   - ./s6-overlay-amd64-installer .
+  #   - ls -a
+  #   - mv s6-services /etc/services.d/
+  #   - mv sysbox /etc/cont-init.d/
+  #   - mv sysbox-mgr /usr/bin/sysbox-mgr
+  #   - mv sysbox-fs /usr/bin/sysbox-fs
+  #   - mv sysbox-runc /usr/bin/sysbox-runc
+    # - git clone https://github.com/nestybox/sysbox.git
+    # - cd sysbox
+    # - make sysbox-in-docker debian-bullseye
+  #   - echo "test"
+  #   - echo "$JSON"
+  #   - echo ""
+  #   - mkdir -p /.system/etc/docker
+  #   - echo $JSON | jq -M > /.system/etc/docker/daemon.json
+  #   - cat /.system/etc/docker/daemon.json
+  #   - dockerd --config-file /.system/etc/docker/daemon.json
+  #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+  #   - apt-get  -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true  install ./sysbox-ce_0.6.4-0.linux_amd64.deb || true
+  #   - apt-get install -y ./sysbox-ce_0.6.4-0.linux_amd64.deb
+  # # # docker must be running
+  #   # - docker info
+  #   # - whoami
+  #   # - usermod -aG docker $USER
+  #   # - newgrp docker
+  #   # - which docker
+  #   # - dockerd
+  #   - cat /etc/docker/daemon.json
+  #   - git clone https://github.com/nestybox/sysbox.git
+  #   - cd sysbox
+  #   - make sysbox -e IMAGE_BASE_DISTRO=debian -e IMAGE_BASE_RELEASE=bullseye
+  #   - make install
+  # #   - wget https://downloads.nestybox.com/sysbox/releases/v0.6.4/sysbox-ce_0.6.4-0.linux_amd64.deb
+  #   - apt install ./sysbox-ce_0.6.4-0.linux_amd64.deb
+
 
   - name: example-modules # Sample module demonstrating importing local and remote modules
     type: includes
