@@ -111,6 +111,14 @@ stages:
     - echo $JSON | jq -M > /.system/etc/docker/daemon.json
     # - dockerd --iptables=false
 
+  - name: crossplane
+    type: shell
+    commands:
+    - curl -sL "https://raw.githubusercontent.com/crossplane/crossplane/main/install.sh" | sh    
+    - mv crossplane /usr/local/bin
+
+
+      
   # - name: install-sysbox # Sample module demonstrating the Shell module with custom commands
   #   type: shell
   #   commands:
